@@ -58,6 +58,7 @@ use App\Livewire\Studio\Tasks\Edit as TasksEdit;
 use App\Livewire\Studio\Tasks\Index as TasksIndex;
 use App\Livewire\Studio\Team\Create as TeamCreate;
 use App\Livewire\Studio\Team\RoleCreate as TeamRoleCreate;
+use App\Livewire\Studio\Team\RoleEdit as TeamRoleEdit;
 use App\Livewire\Studio\Team\Roles as TeamRoles;
 use App\Livewire\Studio\Team\Edit as TeamEdit;
 use App\Livewire\Studio\Team\Index as TeamIndex;
@@ -134,6 +135,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
         Route::get('/team', TeamIndex::class)->name('team.index');
         Route::get('/team/roles', TeamRoles::class)->name('team.roles');
         Route::get('/team/roles/create', TeamRoleCreate::class)->name('team.roles.create');
+        Route::get('/team/roles/{role}/edit', TeamRoleEdit::class)->name('team.roles.edit');
         Route::get('/team/create', TeamCreate::class)->name('team.create');
         Route::get('/team/permissions', TeamPermissions::class)->name('team.permissions');
         Route::get('/team/{member}/edit', TeamEdit::class)->name('team.edit');

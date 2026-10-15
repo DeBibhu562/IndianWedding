@@ -40,7 +40,10 @@
                                 <p class="mt-1 text-xs text-[#16120f]/45">{{ count($custom->permissionList()) }} permissions</p>
                             </div>
                             @if ($canManageCustomRoles)
-                                <button type="button" wire:click="deleteRole({{ $custom->id }})" wire:confirm="Delete role &quot;{{ $custom->name }}&quot;?" class="text-xs text-rose-700">Delete</button>
+                                <div class="flex shrink-0 gap-3 text-xs">
+                                    <a href="{{ route('app.team.roles.edit', $custom) }}" class="text-[#16120f]/70 hover:text-[#16120f]">Edit</a>
+                                    <button type="button" wire:click="deleteRole({{ $custom->id }})" wire:confirm="Delete role &quot;{{ $custom->name }}&quot;?" class="text-rose-700">Delete</button>
+                                </div>
                             @endif
                         </div>
                         @if ($custom->description)

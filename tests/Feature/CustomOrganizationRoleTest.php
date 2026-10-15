@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Livewire\Studio\Team\Create;
 use App\Livewire\Studio\Team\RoleCreate;
+use App\Livewire\Studio\Team\RoleEdit;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
 use App\Models\User;
@@ -46,6 +47,43 @@ class CustomOrganizationRoleTest extends TestCase
         $this->assertDatabaseHas('organization_users', [
             'organization_id' => $org->id,
             'role' => 'custom:drone-operator',
+        ]);
+    }
+
+    public function test_studio_admin_can_edit_custom_role_and_member_role_key_updates_on_rename(): void
+    {
+        [$org, $admin] = $this->studioAdmin();
+
+        $custom = OrganizationRole::withoutTenant()->create([
+            'organization_id' => $org->id,
+            'name' => 'Drone Operator',
+            'slug' => 'drone-operator',
+            'permissions' => ['files.upload'],
+            'sort_order' => 1,
+        ]);
+
+        $org->users()->attach(User::factory()->create()->id, [
+            'role' => $custom->storageKey(),
+            'accepted_at' => now(),
+        ]);
+
+        $this->actingAs($admin)->withSession(['current_organization_id' => $org->id]);
+
+        Livewire::test(RoleEdit::class, ['role' => $custom])
+            ->set('name', 'Aerial Specialist')
+            ->set('permissionStates.files.upload', true)
+            ->set('permissionStates.calendar.view', true)
+            ->call('save')
+            ->assertRedirect(route('app.team.roles'));
+
+        $custom->refresh();
+        $this->assertSame('Aerial Specialist', $custom->name);
+        $this->assertSame('aerial-specialist', $custom->slug);
+        $this->assertContains('calendar.view', $custom->permissionList());
+
+        $this->assertDatabaseHas('organization_users', [
+            'organization_id' => $org->id,
+            'role' => 'custom:aerial-specialist',
         ]);
     }
 

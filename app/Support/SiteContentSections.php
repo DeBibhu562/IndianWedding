@@ -86,7 +86,10 @@ class SiteContentSections
             str_starts_with($key, 'testimonials.') => 'content',
             str_starts_with($key, 'faq.') => 'content',
             str_starts_with($key, 'team.') => 'content',
-            str_starts_with($key, 'packages.') => 'content',
+            str_starts_with($key, 'packages.services_') => 'services_preview',
+            str_starts_with($key, 'packages.production_') => 'production_preview',
+            str_starts_with($key, 'packages.addons_') => 'addons',
+            str_starts_with($key, 'packages.') => 'header',
             str_starts_with($key, 'production.') => 'content',
             default => $group === 'global' ? 'content' : ($group === $key ? 'content' : 'content'),
         };

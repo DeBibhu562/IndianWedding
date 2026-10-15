@@ -3,11 +3,10 @@
 namespace App\Livewire\Studio\Team;
 
 use App\Enums\Permission;
-use App\Enums\Role;
+use App\Livewire\Studio\Team\Concerns\ManagesCustomRoleForm;
 use App\Models\OrganizationRole;
 use App\Support\RoleCatalog;
 use App\Support\Tenant;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -17,50 +16,17 @@ use Livewire\Component;
 #[Title('Create role')]
 class RoleCreate extends Component
 {
+    use ManagesCustomRoleForm;
+
     public string $name = '';
 
     public string $description = '';
-
-    /** @var array<string, bool> */
-    public array $permissionStates = [];
 
     public function mount(): void
     {
         abort_unless(RoleCatalog::canManageCustomRoles(), 403);
 
-        foreach (Permission::grouped() as $permissions) {
-            foreach ($permissions as $permission) {
-                $this->permissionStates[$permission->value] = false;
-            }
-        }
-    }
-
-    public function applyTemplate(string $template): void
-    {
-        $defaults = match ($template) {
-            'photographer' => Role::Photographer->permissions(),
-            'manager' => Role::Manager->permissions(),
-            'editor' => Role::Editor->permissions(),
-            default => [],
-        };
-
-        foreach (Permission::cases() as $permission) {
-            $this->permissionStates[$permission->value] = in_array($permission->value, $defaults, true);
-        }
-    }
-
-    /**
-     * @return list<string>
-     */
-    protected function selectedPermissions(): array
-    {
-        $flat = Arr::dot($this->permissionStates);
-
-        return collect(Permission::cases())
-            ->filter(fn (Permission $permission) => filter_var($flat[$permission->value] ?? false, FILTER_VALIDATE_BOOLEAN))
-            ->map(fn (Permission $permission) => $permission->value)
-            ->values()
-            ->all();
+        $this->initPermissionStates();
     }
 
     public function save(): void

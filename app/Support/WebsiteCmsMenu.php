@@ -74,7 +74,12 @@ class WebsiteCmsMenu
                 'label' => 'Pricing page',
                 'url' => '/packages',
                 'sections' => [
-                    ['id' => 'content', 'label' => 'Page content'],
+                    ['id' => 'header', 'label' => 'Top banner & quick links'],
+                    ['id' => 'wedding', 'label' => 'Wedding packages & prices', 'module' => 'pricing_wedding'],
+                    ['id' => 'services_preview', 'label' => 'Services section text'],
+                    ['id' => 'production_preview', 'label' => 'Production section text'],
+                    ['id' => 'addons', 'label' => 'Add-ons intro'],
+                    ['id' => 'addon_items', 'label' => 'Add-on services list', 'module' => 'pricing_addons'],
                 ],
             ],
             [

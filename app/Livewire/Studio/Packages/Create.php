@@ -39,6 +39,14 @@ class Create extends Component
 
     public string $youtube_url = '';
 
+    public function mount(): void
+    {
+        $type = request()->query('type');
+        if (is_string($type) && in_array($type, PackageOptions::typeKeys(), true)) {
+            $this->package_type = $type;
+        }
+    }
+
     public function save()
     {
         $this->authorize('create', Package::class);

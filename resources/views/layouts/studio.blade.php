@@ -31,7 +31,7 @@
             ['app.projects.index', 'Projects', 'projects', 'app.projects.*'],
             ['app.tasks.index', 'Tasks', 'tasks', 'app.tasks.*'],
             ['app.team.index', 'Team', 'team', 'app.team.index|app.team.create|app.team.edit'],
-            ['app.team.roles', 'Roles', 'roles', 'app.team.roles|app.team.roles.create|app.team.permissions'],
+            ['app.team.roles', 'Roles', 'roles', 'app.team.roles|app.team.roles.create|app.team.roles.edit|app.team.permissions'],
         ],
         'Finance' => [
             ['app.payments.index', 'Payments', 'payments', 'app.payments.*'],

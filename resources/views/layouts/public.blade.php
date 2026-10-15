@@ -95,49 +95,51 @@
         @yield('content')
     </main>
     <footer class="mt-24 bg-[#0c0b0a] text-white">
-        <div class="mx-auto grid max-w-6xl gap-12 px-5 py-16 md:grid-cols-12 md:px-8">
-            <div class="md:col-span-5">
-                <a href="/" class="inline-flex items-center">
-                    <x-brand-logo class="h-14 max-w-[260px]" />
-                </a>
-                <p class="mt-5 max-w-sm text-sm leading-relaxed text-white/60">{{ site('footer.blurb') }}</p>
-                <x-social-links class="mt-6" />
-                <a href="/book-consultation" class="mt-6 inline-flex rounded-full bg-[#c4a574] px-5 py-2.5 text-sm font-medium text-[#16120f] transition hover:bg-[#d4b888]">{{ site('nav.reservation', 'Book Consultant') }}</a>
-            </div>
-            <div class="md:col-span-3">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a574]">{{ site('footer.links_heading', 'Links') }}</p>
-                <div class="mt-4 flex flex-col gap-2.5 text-sm text-white/70">
-                    <a class="transition hover:text-white" href="/">{{ site('nav.home', 'Home') }}</a>
-                    <a class="transition hover:text-white" href="/about">{{ site('nav.about', 'About us') }}</a>
-                    <a class="transition hover:text-white" href="/services">{{ site('nav.services', 'Our Services') }}</a>
-                    <a class="transition hover:text-white" href="/packages">{{ site('nav.packages', 'Packages') }}</a>
-                    <a class="transition hover:text-white" href="/production">{{ site('nav.production', 'Production') }}</a>
-                    <a class="transition hover:text-white" href="/gallery">{{ site('nav.gallery', 'Gallery') }}</a>
-                    <a class="transition hover:text-white" href="/testimonials">{{ site('nav.testimonials', 'Feedbacks') }}</a>
-                    <a class="transition hover:text-white" href="/contact">{{ site('nav.contact', 'Get in touch') }}</a>
-                    <a class="transition hover:text-white" href="/login">Client / studio login</a>
+        <div class="mx-auto max-w-[1400px] px-4 py-16 sm:px-5 md:px-6 lg:px-8 lg:py-20">
+            <div class="grid gap-12 md:grid-cols-12 md:gap-10 lg:gap-16 xl:gap-20">
+                <div class="md:col-span-12 lg:col-span-5 xl:col-span-5">
+                    <a href="/" class="inline-flex items-center">
+                        <x-brand-logo class="h-14 max-w-[280px] lg:h-16 lg:max-w-[300px]" />
+                    </a>
+                    <p class="mt-5 max-w-xl text-sm leading-relaxed text-white/60 lg:text-[15px] lg:leading-relaxed">{{ site('footer.blurb') }}</p>
+                    <x-social-links class="mt-6" />
+                    <a href="/book-consultation" class="mt-6 inline-flex rounded-full bg-[#c4a574] px-5 py-2.5 text-sm font-medium text-[#16120f] transition hover:bg-[#d4b888]">{{ site('nav.reservation', 'Book Consultant') }}</a>
                 </div>
-            </div>
-            <div class="md:col-span-4">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a574]">{{ site('footer.contact_heading', 'Contact Info') }}</p>
-                <div class="mt-4 space-y-3 text-sm leading-relaxed text-white/70">
-                    <p>{{ site('contact.phone') }}</p>
-                    <x-contact-emails />
-                    <p class="whitespace-pre-line">{{ site('contact.office') }}</p>
+                <div class="md:col-span-6 lg:col-span-3 lg:col-start-7 xl:col-start-7">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a574]">{{ site('footer.links_heading', 'Links') }}</p>
+                    <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm text-white/70 sm:grid-cols-1">
+                        <a class="transition hover:text-white" href="/">{{ site('nav.home', 'Home') }}</a>
+                        <a class="transition hover:text-white" href="/about">{{ site('nav.about', 'About us') }}</a>
+                        <a class="transition hover:text-white" href="/services">{{ site('nav.services', 'Our Services') }}</a>
+                        <a class="transition hover:text-white" href="/packages">{{ site('nav.packages', 'Packages') }}</a>
+                        <a class="transition hover:text-white" href="/production">{{ site('nav.production', 'Production') }}</a>
+                        <a class="transition hover:text-white" href="/gallery">{{ site('nav.gallery', 'Gallery') }}</a>
+                        <a class="transition hover:text-white" href="/testimonials">{{ site('nav.testimonials', 'Feedbacks') }}</a>
+                        <a class="transition hover:text-white" href="/contact">{{ site('nav.contact', 'Get in touch') }}</a>
+                        <a class="transition hover:text-white" href="/login">Client / studio login</a>
+                    </div>
+                </div>
+                <div class="md:col-span-6 lg:col-span-4 lg:col-start-10 xl:col-start-10">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c4a574]">{{ site('footer.contact_heading', 'Contact Info') }}</p>
+                    <div class="mt-4 space-y-3 text-sm leading-relaxed text-white/70 lg:text-[15px]">
+                        <p>{{ site('contact.phone') }}</p>
+                        <x-contact-emails />
+                        <p class="max-w-md whitespace-pre-line">{{ site('contact.office') }}</p>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="border-t border-white/10">
-            <div class="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-5 text-xs text-white/40 md:flex-row md:items-center md:justify-between md:px-8">
-                <p>{{ site('footer.copyright') }}</p>
-                <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <div class="mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-5 text-xs text-white/40 sm:px-5 md:flex-row md:items-center md:justify-between md:px-6 lg:px-8">
+                <p class="md:max-w-[33%]">{{ site('footer.copyright') }}</p>
+                <p class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 md:justify-center">
                     <a href="/terms-and-conditions" class="transition hover:text-white/70">Terms</a>
                     <span aria-hidden="true">·</span>
                     <a href="/privacy-policy" class="transition hover:text-white/70">Privacy</a>
                     <span aria-hidden="true">·</span>
                     <a href="/cookie-policy" class="transition hover:text-white/70">Cookies</a>
                 </p>
-                <p>
+                <p class="md:max-w-[33%] md:text-right">
                     Designed and Developed by
                     <a href="https://www.vedmint.com" target="_blank" rel="noopener noreferrer" class="text-[#c4a574] transition hover:text-[#e2c48a]">VedMint Consultancy Services</a>
                 </p>

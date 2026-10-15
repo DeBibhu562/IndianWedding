@@ -53,6 +53,10 @@
     </div>
 @endif
 
+@if (in_array($activeModule, ['pricing_wedding', 'pricing_addons'], true))
+    @include('livewire.platform.partials.cms-pricing-packages')
+@endif
+
 @if ($activeModule === 'faq')
     <form wire:submit="addFaq" class="mb-6 grid gap-3 rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-black/5">
         <input wire:model="faq_question" placeholder="Question" class="rounded-2xl bg-[#f6f1ea] px-4 py-3">

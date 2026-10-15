@@ -1,18 +1,18 @@
 @extends('layouts.public')
 @section('content')
 <section class="mx-auto max-w-6xl px-6 py-20">
-    <p class="text-sm uppercase tracking-[0.25em] text-[#9b7b4b]">Pricing</p>
+    <p class="text-sm uppercase tracking-[0.25em] text-[#9b7b4b]">{{ site('packages.eyebrow', 'Pricing') }}</p>
     <h1 class="mt-4 font-[Cormorant_Garamond] text-5xl">{{ site('packages.heading', 'Wedding Photography & Videography Packages') }}</h1>
     <p class="mt-4 max-w-3xl text-lg opacity-70">{{ site('packages.intro') }}</p>
 
     {{-- Quick links --}}
     <div class="mt-10 flex flex-wrap gap-3">
         <a href="/services" class="inline-flex items-center gap-2 rounded-full bg-[#16120f] px-5 py-2.5 text-sm text-white transition hover:bg-[#2a241f]">
-            All services
+            {{ site('packages.link_services', 'All services') }}
             <span aria-hidden="true">→</span>
         </a>
         <a href="/production" class="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm ring-1 ring-black/10 transition hover:bg-[#f6f1ea]">
-            Production & films
+            {{ site('packages.link_production', 'Production & films') }}
             <span aria-hidden="true">→</span>
         </a>
         <a href="/book-consultation" class="inline-flex items-center gap-2 rounded-full bg-[#c4a574] px-5 py-2.5 text-sm text-[#16120f] transition hover:bg-[#d4b888]">
@@ -22,13 +22,13 @@
 
     {{-- Wedding packages --}}
     <div class="mt-16">
-        <h2 class="font-[Cormorant_Garamond] text-4xl">Wedding packages</h2>
-        <p class="mt-2 max-w-2xl text-sm opacity-60">Fixed pricing tiers for photography, videography and albums — tap a card for the full breakdown.</p>
+        <h2 class="font-[Cormorant_Garamond] text-4xl">{{ site('packages.wedding_heading', 'Wedding packages') }}</h2>
+        <p class="mt-2 max-w-2xl text-sm opacity-60">{{ site('packages.wedding_intro') }}</p>
         <div class="mt-8 grid gap-6 md:grid-cols-2">
             @forelse ($packages as $package)
                 <x-public.package-card :package="$package" :feature-limit="6" />
             @empty
-                <p class="col-span-full text-sm opacity-60">Wedding packages will appear here once added in the studio.</p>
+                <p class="col-span-full text-sm opacity-60">{{ site('packages.empty_wedding', 'Wedding packages will appear here once added in the studio.') }}</p>
             @endforelse
         </div>
     </div>
@@ -38,11 +38,11 @@
         <div class="mt-20">
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h2 class="font-[Cormorant_Garamond] text-4xl">{{ site('services.heading', 'Our Services') }}</h2>
-                    <p class="mt-2 max-w-2xl text-sm opacity-60">{{ site('services.intro') }}</p>
+                    <h2 class="font-[Cormorant_Garamond] text-4xl">{{ site('packages.services_heading', site('services.heading', 'Our Services')) }}</h2>
+                    <p class="mt-2 max-w-2xl text-sm opacity-60">{{ site('packages.services_intro', site('services.intro')) }}</p>
                 </div>
                 <a href="/services" class="shrink-0 rounded-full bg-white px-5 py-2.5 text-sm font-medium ring-1 ring-black/10 transition hover:bg-[#f6f1ea]">
-                    View all services →
+                    {{ site('packages.services_link', 'View all services →') }}
                 </a>
             </div>
             <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -58,16 +58,16 @@
         <div class="mt-20">
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h2 class="font-[Cormorant_Garamond] text-4xl">{{ site('production.heading', 'Production & Creative Services') }}</h2>
-                    <p class="mt-2 max-w-2xl text-sm opacity-60">{{ site('production.intro') }}</p>
+                    <h2 class="font-[Cormorant_Garamond] text-4xl">{{ site('packages.production_heading', site('production.heading', 'Production & Creative Services')) }}</h2>
+                    <p class="mt-2 max-w-2xl text-sm opacity-60">{{ site('packages.production_intro', site('production.intro')) }}</p>
                 </div>
                 <a href="/production" class="shrink-0 rounded-full bg-white px-5 py-2.5 text-sm font-medium ring-1 ring-black/10 transition hover:bg-[#f6f1ea]">
-                    View all production →
+                    {{ site('packages.production_link', 'View all production →') }}
                 </a>
             </div>
 
             @if (($productionProjects ?? collect())->isNotEmpty())
-                <h3 class="mt-10 text-sm font-semibold uppercase tracking-[0.18em] text-[#9b7b4b]">Featured projects</h3>
+                <h3 class="mt-10 text-sm font-semibold uppercase tracking-[0.18em] text-[#9b7b4b]">{{ site('packages.production_featured_heading', 'Featured projects') }}</h3>
                 <div class="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($productionProjects as $project)
                         <x-public.production-project-card :project="$project" />
@@ -76,7 +76,7 @@
             @endif
 
             @if (($productionPackages ?? collect())->isNotEmpty())
-                <h3 class="mt-10 text-sm font-semibold uppercase tracking-[0.18em] text-[#9b7b4b]">Production services</h3>
+                <h3 class="mt-10 text-sm font-semibold uppercase tracking-[0.18em] text-[#9b7b4b]">{{ site('packages.production_services_heading', 'Production services') }}</h3>
                 <div class="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($productionPackages->take(6) as $productionPackage)
                         <x-public.package-card :package="$productionPackage" :show-price="false" :feature-limit="4" />

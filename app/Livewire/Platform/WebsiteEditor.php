@@ -283,6 +283,51 @@ class WebsiteEditor extends Component
         session()->flash('status', 'Gallery image added.');
     }
 
+    public function togglePricingPackagePublic(int $id): void
+    {
+        abort_unless($this->canManagePricingPackages(), 403);
+
+        $package = Package::query()
+            ->where('organization_id', $this->organization()->id)
+            ->whereKey($id)
+            ->firstOrFail();
+
+        $package->update(['is_public' => ! $package->is_public]);
+        session()->flash('status', $package->is_public ? 'Package is now visible on the site.' : 'Package hidden from the public site.');
+    }
+
+    public function movePricingPackage(int $id, int $direction): void
+    {
+        abort_unless($this->canManagePricingPackages(), 403);
+
+        $orgId = $this->organization()->id;
+        $package = Package::query()->where('organization_id', $orgId)->whereKey($id)->firstOrFail();
+
+        $siblings = Package::query()
+            ->where('organization_id', $orgId)
+            ->where('package_type', $package->package_type)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
+        $index = $siblings->search(fn (Package $row) => $row->id === $package->id);
+        if ($index === false) {
+            return;
+        }
+
+        $target = $index + ($direction < 0 ? -1 : 1);
+        if ($target < 0 || $target >= $siblings->count()) {
+            return;
+        }
+
+        $other = $siblings[$target];
+        $order = $package->sort_order;
+        $package->update(['sort_order' => $other->sort_order]);
+        $other->update(['sort_order' => $order]);
+
+        session()->flash('status', 'Order updated.');
+    }
+
     public function deletePortfolio(int $id): void
     {
         $item = PortfolioItem::query()
@@ -357,6 +402,14 @@ class WebsiteEditor extends Component
     {
         return Tenant::current()
             ?? Organization::query()->where('is_active', true)->firstOrFail();
+    }
+
+    protected function canManagePricingPackages(): bool
+    {
+        $user = auth()->user();
+
+        return $user?->canInOrganization('settings.manage', Tenant::current())
+            || $user?->canInOrganization('packages.manage', Tenant::current());
     }
 
     protected function fieldValue(string $key): string
