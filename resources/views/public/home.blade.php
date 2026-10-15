@@ -74,6 +74,19 @@
     </div>
 </section>
 
+<section class="mx-auto mt-24 max-w-6xl px-6" data-scroll>
+    <p class="text-sm uppercase tracking-[0.25em] text-[#9b7b4b]">Instagram</p>
+    <h2 class="mt-3 font-[Cormorant_Garamond] text-4xl">{{ site('home.instagram_handle', '@unik_studioo') }}</h2>
+    <p class="mt-3 max-w-2xl text-sm leading-relaxed text-[#16120f]/70">{{ site('home.instagram_bio') }}</p>
+    <div class="mt-8 grid gap-4 md:grid-cols-2">
+        @foreach ([1, 2, 3, 4] as $n)
+            @if (trim(site('home.instagram_'.$n)) !== '')
+                <p class="rounded-3xl bg-white p-6 text-sm leading-relaxed text-[#16120f]/80">{{ site('home.instagram_'.$n) }}</p>
+            @endif
+        @endforeach
+    </div>
+</section>
+
 <section class="mx-auto mt-16 max-w-3xl px-6 pb-24" data-scroll>
     @include('public.partials.inquiry-form')
 </section>

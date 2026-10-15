@@ -79,6 +79,8 @@
 
             @if ($activeModule)
                 @include('livewire.platform.partials.cms-modules')
+            @elseif ($page === 'home' && $section === 'hero')
+                @include('livewire.platform.partials.cms-hero-slider')
             @else
                 <form wire:submit="saveCopy" class="space-y-6">
                     @if ($activeCopyRows->isEmpty())
@@ -89,7 +91,7 @@
                         <section class="rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-black/5">
                             <div class="grid gap-5">
                                 @foreach ($activeCopyRows as $row)
-                                    <x-cms-field :row="$row" :value="$fields[$row->key] ?? ''" />
+                                    <x-cms-field :row="$row" :value="data_get($fields, $row->key, '')" wire:key="cms-field-{{ $row->key }}" />
                                 @endforeach
                             </div>
                         </section>

@@ -1,53 +1,27 @@
 @php
     use App\Support\UnikStudioAssets;
 
-    $slides = [
-        [
-            'num' => '01',
-            'tab' => site('home.slide_1_tab', 'Wedding Photography & Films'),
-            'title' => site('home.slide_1_title', 'Wedding Photography & Films'),
-            'description' => site('home.slide_1_body', 'Two-camera coverage of rituals, family emotions and reception nights — crafted into albums and films you will keep forever.'),
-            'cta' => site('home.slide_1_cta', 'View weddings'),
-            'href' => site('home.slide_1_href', '/services/wedding-photography'),
-            'image' => site('home.slide_1_image') ?: UnikStudioAssets::url('service-wedding.jpg'),
-        ],
-        [
-            'num' => '02',
-            'tab' => site('home.slide_2_tab', 'Pre-Wedding Stories'),
-            'title' => site('home.slide_2_title', 'Pre-Wedding Stories'),
-            'description' => site('home.slide_2_body', 'Golden-hour portraits and cinematic outdoors — a romantic chapter before the vows, styled for print and film.'),
-            'cta' => site('home.slide_2_cta', 'See pre-weddings'),
-            'href' => site('home.slide_2_href', '/services/pre-wedding-shoot'),
-            'image' => site('home.slide_2_image') ?: UnikStudioAssets::url('service-prewedding.jpg'),
-        ],
-        [
-            'num' => '03',
-            'tab' => site('home.slide_3_tab', 'Candid Documentation'),
-            'title' => site('home.slide_3_title', 'Candid Documentation'),
-            'description' => site('home.slide_3_body', 'Unposed laughter, quiet glances and real energy between rituals — photography that feels honest, never staged.'),
-            'cta' => site('home.slide_3_cta', 'Explore candid'),
-            'href' => site('home.slide_3_href', '/services/candid-shoot'),
-            'image' => site('home.slide_3_image') ?: UnikStudioAssets::url('service-candid.jpg'),
-        ],
-        [
-            'num' => '04',
-            'tab' => site('home.slide_4_tab', 'Cinematography'),
-            'title' => site('home.slide_4_title', 'Cinematography & Films'),
-            'description' => site('home.slide_4_body', 'Movie-language storytelling with colour, motion and sound — highlight films and teaser reels for your wedding day.'),
-            'cta' => site('home.slide_4_cta', 'Watch films'),
-            'href' => site('home.slide_4_href', '/services/cinematography'),
-            'image' => site('home.slide_4_image') ?: UnikStudioAssets::url('service-cinema.jpg'),
-        ],
-        [
-            'num' => '05',
-            'tab' => site('home.slide_5_tab', 'Birthdays & Music Videos'),
-            'title' => site('home.slide_5_title', 'Birthdays & Music Videos'),
-            'description' => site('home.slide_5_body', 'Celebrations and creative productions beyond weddings — birthdays, music videos and lifestyle shoots with the same craft.'),
-            'cta' => site('home.slide_5_cta', 'Book a shoot'),
-            'href' => site('home.slide_5_href', '/book-consultation'),
-            'image' => site('home.slide_5_image') ?: UnikStudioAssets::url('service-birthday.jpg'),
-        ],
+    $defaultImages = [
+        1 => UnikStudioAssets::url('service-wedding.jpg'),
+        2 => UnikStudioAssets::url('service-prewedding.jpg'),
+        3 => UnikStudioAssets::url('service-candid.jpg'),
+        4 => UnikStudioAssets::url('service-cinema.jpg'),
+        5 => UnikStudioAssets::url('service-birthday.jpg'),
     ];
+
+    $slides = [];
+
+    for ($n = 1; $n <= 5; $n++) {
+        $slides[] = [
+            'num' => str_pad((string) $n, 2, '0', STR_PAD_LEFT),
+            'tab' => site("home.slide_{$n}_tab"),
+            'title' => site("home.slide_{$n}_title"),
+            'description' => site("home.slide_{$n}_body"),
+            'cta' => site("home.slide_{$n}_cta"),
+            'href' => site("home.slide_{$n}_href"),
+            'image' => site("home.slide_{$n}_image") ?: ($defaultImages[$n] ?? ''),
+        ];
+    }
 @endphp
 
 <section

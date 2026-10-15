@@ -8,10 +8,12 @@ use App\Models\Package;
 use App\Models\PortfolioItem;
 use App\Models\SiteContent;
 use App\Models\Testimonial;
+use App\Support\SiteContentSections;
 use App\Support\SiteCopy;
 use App\Support\SocialPlatforms;
 use App\Support\Tenant;
 use App\Support\WebsiteCmsMenu;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
@@ -55,10 +57,15 @@ class WebsiteEditor extends Component
     /** @var array<int, TemporaryUploadedFile> */
     public array $portfolio_uploads = [];
 
+    public int $heroSlide = 1;
+
     public function mount(): void
     {
         abort_unless(auth()->user()?->canInOrganization('settings.manage', Tenant::current()), 403);
-        SocialPlatforms::syncForOrganization($this->organization());
+
+        $org = $this->organization();
+        Tenant::set($org->id);
+        SiteContentSections::repairForOrganization($org);
         $this->loadFields();
     }
 
@@ -66,29 +73,37 @@ class WebsiteEditor extends Component
     {
         $this->page = $page;
         $this->section = $section;
+        $this->heroSlide = 1;
         $this->reset('imageUploads');
+    }
+
+    public function selectHeroSlide(int $slide): void
+    {
+        $this->heroSlide = max(1, min(WebsiteCmsMenu::heroSlideCount(), $slide));
     }
 
     public function loadFields(): void
     {
         $org = $this->organization();
-        $this->fields = SiteContent::withoutTenant()
+        $flat = SiteContent::withoutTenant()
             ->where('organization_id', $org->id)
             ->orderBy('sort_order')
             ->get()
             ->mapWithKeys(fn ($row) => [$row->key => (string) $row->value])
             ->all();
+
+        $this->fields = $this->nestFields($flat);
     }
 
     public function saveCopy(): void
     {
         $org = $this->organization();
 
-        foreach ($this->imageUploads as $key => $file) {
+        foreach (Arr::dot($this->imageUploads) as $key => $file) {
             if ($file instanceof TemporaryUploadedFile) {
                 $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
                 $path = $file->storeAs("org/{$org->id}/cms", $filename, 'public');
-                $this->fields[$key] = Storage::disk('public')->url($path);
+                data_set($this->fields, $key, Storage::disk('public')->url($path));
             }
         }
 
@@ -102,16 +117,17 @@ class WebsiteEditor extends Component
             if (str_starts_with((string) $key, 'social.')) {
                 continue;
             }
-            if (! array_key_exists($key, $this->fields)) {
+            if (! Arr::has($this->fields, $key)) {
                 continue;
             }
             SiteContent::withoutTenant()->where('organization_id', $org->id)->where('key', $key)->update([
-                'value' => $this->fields[$key],
+                'value' => (string) data_get($this->fields, $key),
             ]);
         }
 
         SiteCopy::forget($org->id);
         $this->reset('imageUploads');
+        $this->loadFields();
         session()->flash('status', WebsiteCmsMenu::sectionLabel($this->page, $this->section).' saved.');
     }
 
@@ -142,10 +158,11 @@ class WebsiteEditor extends Component
             SiteContent::withoutTenant()->where('organization_id', $org->id)->where('key', $def['key'])->update([
                 'value' => $value,
             ]);
-            $this->fields[$def['key']] = $value;
+            data_set($this->fields, $def['key'], $value);
         }
 
         SiteCopy::forget($org->id);
+        $this->loadFields();
         session()->flash('status', 'Social media links saved.');
     }
 
@@ -164,11 +181,16 @@ class WebsiteEditor extends Component
             'rating' => 5,
         ]);
         $this->reset('testimonial_author', 'testimonial_role', 'testimonial_quote');
+        session()->flash('status', 'Testimonial added.');
     }
 
     public function deleteTestimonial(int $id): void
     {
-        Testimonial::query()->whereKey($id)->delete();
+        Testimonial::query()
+            ->where('organization_id', $this->organization()->id)
+            ->whereKey($id)
+            ->delete();
+        session()->flash('status', 'Testimonial removed.');
     }
 
     public function addFaq(): void
@@ -181,11 +203,16 @@ class WebsiteEditor extends Component
             'is_published' => true,
         ]);
         $this->reset('faq_question', 'faq_answer');
+        session()->flash('status', 'FAQ added.');
     }
 
     public function deleteFaq(int $id): void
     {
-        Faq::query()->whereKey($id)->delete();
+        Faq::query()
+            ->where('organization_id', $this->organization()->id)
+            ->whereKey($id)
+            ->delete();
+        session()->flash('status', 'FAQ removed.');
     }
 
     public function updatedPortfolioUploads(): void
@@ -258,9 +285,13 @@ class WebsiteEditor extends Component
 
     public function deletePortfolio(int $id): void
     {
-        $item = PortfolioItem::query()->findOrFail($id);
+        $item = PortfolioItem::query()
+            ->where('organization_id', $this->organization()->id)
+            ->whereKey($id)
+            ->firstOrFail();
         $item->deleteStoredImage();
         $item->delete();
+        session()->flash('status', 'Gallery image removed.');
     }
 
     /**
@@ -319,7 +350,7 @@ class WebsiteEditor extends Component
 
     protected function contentGroup(): string
     {
-        return $this->page === 'global' ? $this->section : $this->page;
+        return SiteContentSections::contentGroupFor($this->page, $this->section);
     }
 
     protected function organization(): Organization
@@ -330,10 +361,21 @@ class WebsiteEditor extends Component
 
     protected function fieldValue(string $key): string
     {
-        if (array_key_exists($key, $this->fields)) {
-            return (string) $this->fields[$key];
+        return (string) data_get($this->fields, $key, '');
+    }
+
+    /**
+     * @param  array<string, string>  $flat
+     * @return array<string, mixed>
+     */
+    protected function nestFields(array $flat): array
+    {
+        $nested = [];
+
+        foreach ($flat as $key => $value) {
+            data_set($nested, $key, $value);
         }
 
-        return (string) data_get($this->fields, $key, '');
+        return $nested;
     }
 }

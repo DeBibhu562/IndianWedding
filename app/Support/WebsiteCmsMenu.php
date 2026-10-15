@@ -34,7 +34,7 @@ class WebsiteCmsMenu
                 'label' => 'Home page',
                 'url' => '/',
                 'sections' => [
-                    ['id' => 'hero', 'label' => 'Hero & slider'],
+                    ['id' => 'hero', 'label' => 'Hero slider (5 tabs)'],
                     ['id' => 'story', 'label' => 'Story section'],
                     ['id' => 'services', 'label' => 'Services preview'],
                     ['id' => 'moments', 'label' => 'Stats & counters'],
@@ -183,5 +183,20 @@ class WebsiteCmsMenu
     public static function copyGroupLabel(string $group): string
     {
         return self::pageLabel($group);
+    }
+
+    public static function heroSlideCount(): int
+    {
+        return 5;
+    }
+
+    public static function isHeroSlideKey(string $key, int $slide): bool
+    {
+        return preg_match('/^home\.slide_'.$slide.'_/', $key) === 1;
+    }
+
+    public static function isAnyHeroSlideKey(string $key): bool
+    {
+        return preg_match('/^home\.slide_\d+_/', $key) === 1;
     }
 }

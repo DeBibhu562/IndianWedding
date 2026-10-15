@@ -13,7 +13,7 @@
         {{ $attributes->class('w-full rounded-2xl bg-[#f6f1ea] px-4 py-3') }}
     ></textarea>
 @else
-    <div {{ $attributes->class('rich-text-host') }} wire:ignore>
+    <div {{ $attributes->class('rich-text-host') }} wire:ignore wire:key="rich-text-{{ $model }}">
         <div
             x-data="richTextEditor(@entangle($model).live)"
             x-init="init()"

@@ -32,13 +32,14 @@ class SocialPlatforms
     public static function syncForOrganization(Organization $organization): void
     {
         foreach (self::definitions() as $def) {
-            SiteContent::withoutTenant()->firstOrCreate(
+            SiteContent::withoutTenant()->updateOrCreate(
                 [
                     'organization_id' => $organization->id,
                     'key' => $def['key'],
                 ],
                 [
                     'group' => 'social',
+                    'section' => 'social',
                     'label' => $def['label'],
                     'value' => '',
                     'type' => 'input',

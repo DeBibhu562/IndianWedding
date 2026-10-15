@@ -1,6 +1,6 @@
 @props(['row', 'value' => ''])
 
-<label class="block text-sm">
+<label {{ $attributes->class('block text-sm') }}>
     <span class="font-medium text-[#16120f]/70">{{ $row->label ?: $row->key }}</span>
 
     @if ($row->type === 'image')

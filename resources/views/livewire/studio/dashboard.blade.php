@@ -309,8 +309,8 @@
             el._chart.destroy();
         }
 
-        const labels = {!! json_encode(array_map(fn ($s) => ucwords(str_replace('_', ' ', $s)), array_keys($stats['projects_by_status']->toArray()))) !!};
-        const data = {!! json_encode(array_values($stats['projects_by_status']->toArray())) !!};
+        const labels = @json($stats['projects_chart']['labels']);
+        const data = @json($stats['projects_chart']['data']);
         const colors = ['#c4a574', '#9b7b4b', '#16120f', '#6b645c', '#d4b584', '#ebe4d8'];
 
         el._chart = new Chart(el, {
