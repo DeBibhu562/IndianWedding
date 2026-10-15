@@ -5,9 +5,8 @@ namespace App\Livewire\Studio\Team;
 use App\Enums\Role;
 use App\Models\OrganizationUser;
 use App\Models\User;
+use App\Support\AssignableTeamRoles;
 use App\Support\Tenant;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -21,41 +20,91 @@ class Create extends Component
 
     public string $email = '';
 
+    public string $phone = '';
+
+    public string $whatsapp = '';
+
+    public string $password = '';
+
+    public string $password_confirmation = '';
+
     public string $role = 'photographer';
+
+    public bool $is_active = true;
 
     public function save()
     {
         $this->authorize('create', OrganizationUser::class);
 
-        $data = $this->validate([
+        $email = strtolower(trim($this->email));
+        $existingUser = User::query()->where('email', $email)->first();
+
+        $emailRules = ['required', 'email', 'max:120'];
+        if (! $existingUser) {
+            $emailRules[] = Rule::unique('users', 'email');
+        }
+
+        $rules = [
             'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:120', Rule::unique('users', 'email')],
+            'email' => $emailRules,
+            'phone' => ['nullable', 'string', 'max:30'],
+            'whatsapp' => ['nullable', 'string', 'max:30'],
             'role' => ['required', Rule::enum(Role::class)],
-        ]);
+            'is_active' => ['boolean'],
+            'password' => $existingUser
+                ? ['nullable', 'confirmed', 'min:10']
+                : ['required', 'confirmed', 'min:10'],
+        ];
+
+        $data = $this->validate($rules);
+        $data['email'] = $email;
 
         $role = Role::from($data['role']);
-        if ($role === Role::StudioAdmin || $role === Role::Client) {
-            $this->addError('role', 'Choose a staff role for this member.');
+        if ($role === Role::Client || ! AssignableTeamRoles::canAssign(auth()->user(), $role)) {
+            $this->addError('role', 'You cannot assign this role.');
 
             return;
         }
 
-        $user = User::query()->firstOrCreate(
-            ['email' => $data['email']],
-            [
-                'name' => $data['name'],
-                'password' => Hash::make(Str::password(16)),
-                'is_active' => true,
-            ],
-        );
+        $organizationId = Tenant::requireId();
 
-        if ($user->wasRecentlyCreated === false) {
-            $user->update(['name' => $data['name']]);
+        if ($existingUser) {
+            $alreadyMember = OrganizationUser::query()
+                ->where('organization_id', $organizationId)
+                ->where('user_id', $existingUser->id)
+                ->exists();
+
+            if ($alreadyMember) {
+                $this->addError('email', 'This person is already on your team. Edit their profile from the team list.');
+
+                return;
+            }
+        }
+
+        $userAttributes = [
+            'name' => $data['name'],
+            'phone' => trim($data['phone']) ?: null,
+            'whatsapp' => trim($data['whatsapp']) ?: null,
+            'is_active' => (bool) $data['is_active'],
+        ];
+
+        if ($existingUser) {
+            if (trim($this->password) !== '') {
+                $userAttributes['password'] = $this->password;
+            }
+            $existingUser->update($userAttributes);
+            $user = $existingUser;
+        } else {
+            $user = User::query()->create([
+                ...$userAttributes,
+                'email' => $data['email'],
+                'password' => $this->password,
+            ]);
         }
 
         OrganizationUser::query()->updateOrCreate(
             [
-                'organization_id' => Tenant::requireId(),
+                'organization_id' => $organizationId,
                 'user_id' => $user->id,
             ],
             [
@@ -65,7 +114,7 @@ class Create extends Component
             ],
         );
 
-        session()->flash('status', 'Team member added.');
+        session()->flash('status', 'Team member added. Share their login email and password securely.');
 
         return $this->redirect(route('app.team.index'), navigate: true);
     }
@@ -75,11 +124,7 @@ class Create extends Component
         $this->authorize('create', OrganizationUser::class);
 
         return view('livewire.studio.team.create', [
-            'roles' => array_values(array_filter(
-                Role::cases(),
-                fn (Role $role) => $role->isStaff() && $role !== Role::StudioAdmin,
-            )),
-            'isEdit' => false,
+            'roles' => AssignableTeamRoles::forActor(),
         ]);
     }
 }
