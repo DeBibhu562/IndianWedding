@@ -28,17 +28,23 @@ class AssignableTeamRoles
             ));
         }
 
-        if ($actorRole === Role::Admin || $user->canInOrganization('users.manage', Tenant::current())) {
-            return array_values(array_filter(
-                Role::cases(),
-                fn (Role $role) => in_array($role, [
-                    Role::Admin,
-                    Role::Manager,
-                    Role::Photographer,
-                    Role::Videographer,
-                    Role::Editor,
-                ], true),
-            ));
+        if ($actorRole === Role::Admin) {
+            return [
+                Role::Admin,
+                Role::Manager,
+                Role::Photographer,
+                Role::Videographer,
+                Role::Editor,
+            ];
+        }
+
+        if ($user->canInOrganization('users.manage', Tenant::current())) {
+            return [
+                Role::Manager,
+                Role::Photographer,
+                Role::Videographer,
+                Role::Editor,
+            ];
         }
 
         return [];

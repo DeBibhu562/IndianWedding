@@ -22,7 +22,7 @@ class TeamAssignedNotification extends Notification implements ShouldQueue
     {
         return [
             'title' => 'New assignment',
-            'body' => 'You were assigned as '.$this->member->role->label().' on a project.',
+            'body' => 'You were assigned as '.$this->member->roleLabel().' on a project.',
             'project_id' => $this->member->project_id,
         ];
     }

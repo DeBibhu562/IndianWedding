@@ -23,11 +23,11 @@
             <div class="flex items-start justify-between gap-3">
                 <div>
                     <p class="text-lg font-medium">{{ $member->user?->name }}</p>
-                    <p class="text-sm text-[#16120f]/60">{{ $member->role->label() }}</p>
+                    <p class="text-sm text-[#16120f]/60">{{ $member->roleLabel() }}</p>
                     <p class="mt-1 text-xs text-[#16120f]/45">{{ $member->user?->email }}</p>
                 </div>
                 <div class="flex gap-2">
-                    @if ($canEdit && ! $member->is_owner)
+                    @if ($canEdit && ! $member->is_owner && auth()->user()?->can('update', $member))
                     <a href="{{ route('app.team.edit', $member) }}" class="text-xs text-[#9b7b4b]">Edit</a>
                     @endif
                     @if ($canDelete && ! $member->is_owner && $member->user_id !== auth()->id())
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <p class="mt-2 text-sm text-[#16120f]/50">{{ $workload[$member->user_id] ?? 0 }} active assignments</p>
-            @if ($member->role === \App\Enums\Role::StudioAdmin)
+            @if ($member->roleEnum() === \App\Enums\Role::StudioAdmin)
             <p class="mt-3 inline-flex rounded-full bg-[#f6f1ea] px-2.5 py-1 text-[10px] font-semibold text-[#9b7b4b]">Full studio access</p>
             @elseif ($member->is_owner)
             <p class="mt-3 inline-flex rounded-full bg-[#f6f1ea] px-2.5 py-1 text-[10px] font-semibold text-[#9b7b4b]">Owner</p>

@@ -11,7 +11,7 @@
     <x-swal-flash />
 
     <form wire:submit="save" class="rounded-[28px] bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
-        @include('livewire.studio.team._member-form', ['roles' => $roles, 'isEdit' => true])
+        @include('livewire.studio.team._member-form', ['roleOptions' => $roleOptions, 'isEdit' => true])
 
         <div class="mt-8 flex flex-wrap gap-2 border-t border-black/5 pt-6">
             <button type="submit" class="rounded-full bg-[#16120f] px-6 py-2.5 text-sm font-medium text-white shadow-sm" wire:loading.attr="disabled">

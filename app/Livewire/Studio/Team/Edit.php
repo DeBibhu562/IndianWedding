@@ -5,7 +5,7 @@ namespace App\Livewire\Studio\Team;
 use App\Enums\Role;
 use App\Models\OrganizationUser;
 use App\Support\AssignableTeamRoles;
-use App\Support\Tenant;
+use App\Support\RoleCatalog;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -39,7 +39,7 @@ class Edit extends Component
         abort_if($member->is_owner, 403);
 
         $actor = auth()->user();
-        if ($member->role === Role::StudioAdmin && ! AssignableTeamRoles::canAssign($actor, Role::StudioAdmin)) {
+        if ($member->roleEnum() === Role::StudioAdmin && ! AssignableTeamRoles::canAssign($actor, Role::StudioAdmin)) {
             abort(403, 'Only Studio Admin can edit another Studio Admin.');
         }
 
@@ -48,7 +48,7 @@ class Edit extends Component
         $this->email = $member->user?->email ?? '';
         $this->phone = $member->user?->phone ?? '';
         $this->whatsapp = $member->user?->whatsapp ?? '';
-        $this->role = $member->role->value;
+        $this->role = (string) $member->role;
         $this->is_active = (bool) ($member->user?->is_active ?? true);
     }
 
@@ -66,7 +66,7 @@ class Edit extends Component
             ],
             'phone' => ['nullable', 'string', 'max:30'],
             'whatsapp' => ['nullable', 'string', 'max:30'],
-            'role' => ['required', Rule::enum(Role::class)],
+            'role' => ['required', 'string', 'max:120'],
             'is_active' => ['boolean'],
         ];
 
@@ -76,9 +76,9 @@ class Edit extends Component
 
         $data = $this->validate($rules);
 
-        $role = Role::from($data['role']);
-        if ($role === Role::StudioAdmin || $role === Role::Client) {
-            $this->addError('role', 'Choose a staff role for this member.');
+        $roleValue = $data['role'];
+        if ($roleValue === Role::Client->value || ! RoleCatalog::canAssign(auth()->user(), $roleValue)) {
+            $this->addError('role', 'You cannot assign this role.');
 
             return;
         }
@@ -96,7 +96,7 @@ class Edit extends Component
         }
 
         $this->member->user?->update($userPayload);
-        $this->member->update(['role' => $role]);
+        $this->member->update(['role' => $roleValue]);
 
         session()->flash('status', 'Team member updated.');
 
@@ -106,10 +106,7 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.studio.team.edit', [
-            'roles' => array_values(array_filter(
-                Role::cases(),
-                fn (Role $role) => $role->isStaff() && $role !== Role::StudioAdmin,
-            )),
+            'roleOptions' => RoleCatalog::optionsForActor(),
         ]);
     }
 }

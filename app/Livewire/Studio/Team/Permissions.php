@@ -36,9 +36,13 @@ class Permissions extends Component
         abort_unless(auth()->user()?->canInOrganization('permissions.manage', Tenant::current()), 403);
 
         $member = $this->findMember($this->selectedMemberId);
-                    abort_if($member->role === Role::StudioAdmin || $member->role === Role::Admin, 403, 'Studio Admin and Admin roles are managed by the system.');
+        abort_if(
+            in_array($member->roleEnum(), [Role::StudioAdmin, Role::Admin], true),
+            403,
+            'Studio Admin and Admin roles are managed by the system.',
+        );
 
-        $roleDefaults = $member->role->permissions();
+        $roleDefaults = $member->rolePermissions();
         $grants = [];
         $revokes = [];
 
@@ -85,7 +89,7 @@ class Permissions extends Component
         $custom = is_array($member->permissions) ? $member->permissions : [];
         $grants = $custom['grants'] ?? [];
         $revokes = $custom['revokes'] ?? [];
-        $roleDefaults = $member->role->permissions();
+        $roleDefaults = $member->rolePermissions();
 
         $this->permissionStates = [];
 

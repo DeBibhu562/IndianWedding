@@ -47,6 +47,33 @@ class TeamMemberCreateTest extends TestCase
         ]);
     }
 
+    public function test_admin_role_user_can_add_member_with_admin_role(): void
+    {
+        [$org, $adminUser] = $this->studioAdmin();
+
+        $operator = User::factory()->create();
+        $org->users()->attach($operator->id, ['role' => 'admin', 'accepted_at' => now()]);
+
+        $this->actingAs($operator)->withSession(['current_organization_id' => $org->id]);
+
+        Livewire::test(Create::class)
+            ->set('name', 'Second Admin')
+            ->set('email', 'admin2@unikstudio.in')
+            ->set('password', 'secure-pass-10')
+            ->set('password_confirmation', 'secure-pass-10')
+            ->set('role', 'admin')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $userId = User::query()->where('email', 'admin2@unikstudio.in')->value('id');
+
+        $this->assertDatabaseHas('organization_users', [
+            'organization_id' => $org->id,
+            'user_id' => $userId,
+            'role' => 'admin',
+        ]);
+    }
+
     /**
      * @return array{0: Organization, 1: User}
      */

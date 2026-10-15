@@ -65,14 +65,7 @@ class User extends Authenticatable
             return null;
         }
 
-        $value = $membership->role instanceof Role ? $membership->role->value : (string) $membership->role;
-
-        if ($value === 'super_admin') {
-            $value = Role::StudioAdmin->value;
-        }
-
-        // Legacy alias: older "manager" accounts treated as Admin when labeled that way in UI.
-        return Role::tryFrom($value);
+        return $membership->roleEnum();
     }
 
     public function isOrganizationOwner(?Organization $organization = null): bool
@@ -136,7 +129,7 @@ class User extends Authenticatable
             return true;
         }
 
-        return $role?->can($permission) ?? false;
+        return in_array($permission, $membership->rolePermissions(), true);
     }
 
     public function isClient(?Organization $organization = null): bool

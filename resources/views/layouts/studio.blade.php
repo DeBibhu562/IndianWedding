@@ -30,7 +30,8 @@
             ['app.clients.index', 'Clients', 'clients', 'app.clients.*'],
             ['app.projects.index', 'Projects', 'projects', 'app.projects.*'],
             ['app.tasks.index', 'Tasks', 'tasks', 'app.tasks.*'],
-            ['app.team.index', 'Team', 'team', 'app.team.*'],
+            ['app.team.index', 'Team', 'team', 'app.team.index|app.team.create|app.team.edit'],
+            ['app.team.roles', 'Roles', 'roles', 'app.team.roles|app.team.roles.create|app.team.permissions'],
         ],
         'Finance' => [
             ['app.payments.index', 'Payments', 'payments', 'app.payments.*'],
@@ -82,6 +83,7 @@
                                 $permission = $link[4] ?? null;
                             @endphp
                             @continue($permission && ! $user?->canInOrganization($permission, \App\Support\Tenant::current()))
+                            @continue($route === 'app.team.roles' && ! ($user?->can('create', \App\Models\OrganizationUser::class) || $user?->canInOrganization('permissions.manage', \App\Support\Tenant::current())))
                             @php $active = collect(explode('|', $match))->contains(fn ($pattern) => request()->routeIs($pattern)); @endphp
                             <a href="{{ route($route) }}" @click="sidebar=false" class="flex items-center gap-3 rounded-xl py-2.5 text-sm transition {{ $active ? 'border-l-2 border-[#c4a574] bg-white/10 pl-[10px] pr-3 text-[#e2c48a]' : 'border-l-2 border-transparent px-3 text-white/70 hover:bg-white/5 hover:text-white' }}">
                                 <x-studio.icon :name="$icon" class="h-[18px] w-[18px]" />

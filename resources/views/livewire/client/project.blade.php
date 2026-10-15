@@ -50,7 +50,7 @@
         <h2 class="text-xs uppercase tracking-[0.2em] text-white/40">Team</h2>
         <ul class="mt-4 space-y-2 text-sm">
             @forelse ($project->team as $member)
-                <li>{{ $member->user?->name }} · {{ $member->role->label() }}</li>
+                <li>{{ $member->user?->name }} · {{ $member->roleLabel() }}</li>
             @empty
                 <li class="text-white/40">Your crew will appear here once assigned.</li>
             @endforelse

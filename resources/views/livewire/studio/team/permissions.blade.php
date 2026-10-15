@@ -21,11 +21,11 @@
                 >
                     <span>
                         <span class="block text-sm font-medium">{{ $member->user?->name }}</span>
-                        <span class="block text-xs {{ $selectedMemberId === $member->id ? 'text-white/60' : 'text-[#16120f]/45' }}">{{ $member->role->label() }}</span>
+                        <span class="block text-xs {{ $selectedMemberId === $member->id ? 'text-white/60' : 'text-[#16120f]/45' }}">{{ $member->roleLabel() }}</span>
                     </span>
-                    @if ($member->role === \App\Enums\Role::StudioAdmin)
+                    @if ($member->roleEnum() === \App\Enums\Role::StudioAdmin)
                     <span class="rounded-full bg-[#c4a574]/20 px-2 py-0.5 text-[10px] font-semibold text-[#c4a574]">Full + delete</span>
-                    @elseif ($member->role === \App\Enums\Role::Admin)
+                    @elseif ($member->roleEnum() === \App\Enums\Role::Admin)
                     <span class="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/70">Full (no delete)</span>
                     @endif
                 </button>
@@ -38,10 +38,10 @@
             <div class="rounded-3xl bg-white p-10 text-center shadow-sm ring-1 ring-black/5">
                 <p class="text-sm text-[#16120f]/45">Select a team member to manage their permissions.</p>
             </div>
-            @elseif ($selected->role === \App\Enums\Role::StudioAdmin || $selected->role === \App\Enums\Role::Admin)
+            @elseif (in_array($selected->roleEnum(), [\App\Enums\Role::StudioAdmin, \App\Enums\Role::Admin], true))
             <div class="rounded-3xl bg-[#16120f] p-8 text-[#f6f1ea] shadow-sm">
                 <h2 class="font-[Cormorant_Garamond] text-3xl">{{ $selected->user?->name }}</h2>
-                @if ($selected->role === \App\Enums\Role::StudioAdmin)
+                @if ($selected->roleEnum() === \App\Enums\Role::StudioAdmin)
                 <p class="mt-2 text-sm text-white/60">Studio Admin has full access including permanent delete across the studio.</p>
                 @else
                 <p class="mt-2 text-sm text-white/60">Admin can create, view and update everything, but cannot delete records. Only Studio Admin can delete.</p>
@@ -52,7 +52,7 @@
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
                         <h2 class="font-[Cormorant_Garamond] text-3xl">{{ $selected->user?->name }}</h2>
-                        <p class="mt-1 text-sm text-[#16120f]/50">Role: {{ $selected->role->label() }} · toggle permissions below</p>
+                        <p class="mt-1 text-sm text-[#16120f]/50">Role: {{ $selected->roleLabel() }} · toggle permissions below</p>
                     </div>
                     <button type="submit" class="rounded-xl bg-[#16120f] px-4 py-2 text-sm font-medium text-white hover:bg-[#2a2218]">
                         Save permissions

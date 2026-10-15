@@ -1,4 +1,4 @@
-@props(['roles', 'isEdit' => false])
+@props(['roleOptions', 'isEdit' => false])
 
 <div class="space-y-8">
     <section>
@@ -94,14 +94,18 @@
         <label class="mt-4 block text-sm">
             <span class="font-medium text-[#16120f]/70">Role <span class="text-rose-600">*</span></span>
             <select wire:model.live="role" class="mt-2 w-full rounded-2xl bg-[#f6f1ea] px-4 py-3 text-sm">
-                @foreach ($roles as $roleOption)
-                    <option value="{{ $roleOption->value }}">{{ $roleOption->label() }}</option>
+                @foreach ($roleOptions as $roleOption)
+                    <option value="{{ $roleOption['value'] }}">
+                        {{ $roleOption['label'] }}@if ($roleOption['custom'] ?? false) (custom)@endif
+                    </option>
                 @endforeach
             </select>
             @error('role') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
             @php
-                $roleHint = match ($role ?? '') {
-                    'admin' => 'Full access to leads, projects, finance, and settings. Cannot permanently delete records.',
+                $selected = collect($roleOptions)->firstWhere('value', $role ?? '');
+                $roleHint = $selected['description'] ?? match ($role ?? '') {
+                    'studio_admin' => 'Full studio control, including permanent delete. Only assign to trusted owners.',
+                    'admin' => 'Full access to leads, projects, finance, and team management. Cannot permanently delete records.',
                     'manager' => 'Runs pipeline, clients, calendar, and team assignments day to day.',
                     'photographer' => 'Sees assigned shoots, uploads files, and manages their calendar.',
                     'videographer' => 'Same as photographer, focused on film deliverables.',

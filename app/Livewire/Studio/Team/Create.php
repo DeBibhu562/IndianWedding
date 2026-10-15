@@ -5,7 +5,7 @@ namespace App\Livewire\Studio\Team;
 use App\Enums\Role;
 use App\Models\OrganizationUser;
 use App\Models\User;
-use App\Support\AssignableTeamRoles;
+use App\Support\RoleCatalog;
 use App\Support\Tenant;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -49,7 +49,7 @@ class Create extends Component
             'email' => $emailRules,
             'phone' => ['nullable', 'string', 'max:30'],
             'whatsapp' => ['nullable', 'string', 'max:30'],
-            'role' => ['required', Rule::enum(Role::class)],
+            'role' => ['required', 'string', 'max:120'],
             'is_active' => ['boolean'],
             'password' => $existingUser
                 ? ['nullable', 'confirmed', 'min:10']
@@ -59,8 +59,8 @@ class Create extends Component
         $data = $this->validate($rules);
         $data['email'] = $email;
 
-        $role = Role::from($data['role']);
-        if ($role === Role::Client || ! AssignableTeamRoles::canAssign(auth()->user(), $role)) {
+        $roleValue = $data['role'];
+        if ($roleValue === Role::Client->value || ! RoleCatalog::canAssign(auth()->user(), $roleValue)) {
             $this->addError('role', 'You cannot assign this role.');
 
             return;
@@ -108,7 +108,7 @@ class Create extends Component
                 'user_id' => $user->id,
             ],
             [
-                'role' => $role,
+                'role' => $roleValue,
                 'invited_at' => now(),
                 'accepted_at' => now(),
             ],
@@ -124,7 +124,7 @@ class Create extends Component
         $this->authorize('create', OrganizationUser::class);
 
         return view('livewire.studio.team.create', [
-            'roles' => AssignableTeamRoles::forActor(),
+            'roleOptions' => RoleCatalog::optionsForActor(),
         ]);
     }
 }

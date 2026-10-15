@@ -25,7 +25,12 @@ class EnsureStudioStaff
             return redirect()->route('client.dashboard');
         }
 
-        abort_unless($role?->isStaff() || $user->hasFullStudioAccess(), 403);
+        $membership = $user->membershipIn(Tenant::current());
+        abort_unless(
+            $user->hasFullStudioAccess()
+            || ($membership?->isStudioStaff() ?? false),
+            403,
+        );
 
         return $next($request);
     }
